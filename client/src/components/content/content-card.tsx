@@ -41,11 +41,23 @@ export default function ContentCard({ content, onClick }: ContentCardProps) {
         {/* Hover actions */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="flex space-x-4 space-x-reverse">
-            <button className="p-3 bg-orange-500 hover:bg-orange-600 rounded-full text-white transition-colors">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick?.(content);
+              }}
+              className="p-3 bg-orange-500 hover:bg-orange-600 rounded-full text-white transition-colors"
+            >
               <Play className="w-6 h-6" />
             </button>
             {content.downloadUrl && (
-              <button className="p-3 bg-gray-600 hover:bg-gray-500 rounded-full text-white transition-colors">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(content.downloadUrl, '_blank');
+                }}
+                className="p-3 bg-gray-600 hover:bg-gray-500 rounded-full text-white transition-colors"
+              >
                 <Download className="w-6 h-6" />
               </button>
             )}

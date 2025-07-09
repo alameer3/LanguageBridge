@@ -4,7 +4,9 @@ import Navigation from "@/components/layout/navigation";
 import Footer from "@/components/layout/footer";
 import ContentGrid from "@/components/content/content-grid";
 import Filters from "@/components/content/filters";
+import VideoPlayer from "@/components/content/video-player";
 import { CONTENT_TYPES } from "@/lib/constants";
+import { Content } from "@shared/schema";
 
 export default function Movies() {
   const [filters, setFilters] = useState({
@@ -15,6 +17,8 @@ export default function Movies() {
     quality: "",
     rating: ""
   });
+  
+  const [selectedContent, setSelectedContent] = useState<Content | null>(null);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({
@@ -32,6 +36,10 @@ export default function Movies() {
       quality: "",
       rating: ""
     });
+  };
+
+  const handleContentClick = (content: Content) => {
+    setSelectedContent(content);
   };
 
   return (
@@ -56,10 +64,19 @@ export default function Movies() {
           filters={filters}
           title=""
           showViewAll={false}
+          onContentClick={handleContentClick}
         />
       </div>
 
       <Footer />
+      
+      {/* Video Player Modal */}
+      {selectedContent && (
+        <VideoPlayer
+          content={selectedContent}
+          onClose={() => setSelectedContent(null)}
+        />
+      )}
     </div>
   );
 }

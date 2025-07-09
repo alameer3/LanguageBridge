@@ -1,12 +1,21 @@
+import { useState } from "react";
 import { Film, Tv, Monitor, Music } from "lucide-react";
 import { Link } from "wouter";
 import Header from "@/components/layout/header";
 import Navigation from "@/components/layout/navigation";
 import Footer from "@/components/layout/footer";
 import ContentGrid from "@/components/content/content-grid";
+import VideoPlayer from "@/components/content/video-player";
 import { CONTENT_TYPES } from "@/lib/constants";
+import { Content } from "@shared/schema";
 
 export default function Home() {
+  const [selectedContent, setSelectedContent] = useState<Content | null>(null);
+
+  const handleContentClick = (content: Content) => {
+    setSelectedContent(content);
+  };
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -70,6 +79,7 @@ export default function Home() {
             contentType={CONTENT_TYPES.MOVIE}
             title="أحدث الأفلام"
             showViewAll={true}
+            onContentClick={handleContentClick}
           />
         </div>
       </section>
@@ -81,6 +91,7 @@ export default function Home() {
             contentType={CONTENT_TYPES.SERIES}
             title="أحدث المسلسلات"
             showViewAll={true}
+            onContentClick={handleContentClick}
           />
         </div>
       </section>
@@ -92,6 +103,7 @@ export default function Home() {
             contentType={CONTENT_TYPES.TV}
             title="برامج التلفزيون"
             showViewAll={true}
+            onContentClick={handleContentClick}
           />
         </div>
       </section>
@@ -103,11 +115,20 @@ export default function Home() {
             contentType={CONTENT_TYPES.MISC}
             title="المنوعات"
             showViewAll={true}
+            onContentClick={handleContentClick}
           />
         </div>
       </section>
 
       <Footer />
+      
+      {/* Video Player Modal */}
+      {selectedContent && (
+        <VideoPlayer
+          content={selectedContent}
+          onClose={() => setSelectedContent(null)}
+        />
+      )}
     </div>
   );
 }

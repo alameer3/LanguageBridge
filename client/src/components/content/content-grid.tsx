@@ -11,9 +11,10 @@ interface ContentGridProps {
   filters?: any;
   title: string;
   showViewAll?: boolean;
+  onContentClick?: (content: Content) => void;
 }
 
-export default function ContentGrid({ contentType, filters, title, showViewAll = true }: ContentGridProps) {
+export default function ContentGrid({ contentType, filters, title, showViewAll = true, onContentClick }: ContentGridProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 24;
 
@@ -67,7 +68,7 @@ export default function ContentGrid({ contentType, filters, title, showViewAll =
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
             {data.content.map((item: Content) => (
-              <ContentCard key={item.id} content={item} />
+              <ContentCard key={item.id} content={item} onClick={onContentClick} />
             ))}
           </div>
 
