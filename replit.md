@@ -7,6 +7,9 @@ This is a full-stack web application for an Arabic cinema streaming platform cal
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+- User requested to remove dropdown menu from header
+- User wants complete replication of ak.sv design
+- User prefers Arabic communication
 
 ## System Architecture
 

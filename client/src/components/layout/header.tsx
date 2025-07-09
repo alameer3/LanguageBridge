@@ -46,9 +46,6 @@ export default function Header() {
 
           {/* User Menu */}
           <div className="flex items-center space-x-4 space-x-reverse">
-            <Button variant="ghost" size="icon" className="hover:bg-card">
-              <Bell className="w-5 h-5" />
-            </Button>
             <Button variant="ghost" className="flex items-center space-x-2 space-x-reverse hover:bg-card">
               <User className="w-5 h-5" />
               <span className="hidden lg:inline">أهلاً بك</span>

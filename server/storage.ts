@@ -53,49 +53,48 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getContent(id: number): Promise<Content | undefined> {
-    const [content] = await db.select().from(content).where(eq(content.id, id));
-    return content || undefined;
+    const [foundContent] = await db.select().from(content).where(eq(content.id, id));
+    return foundContent || undefined;
   }
 
   async getContentByType(type: string, page: number = 1, limit: number = 20, filters?: any): Promise<{ content: Content[], total: number }> {
-    let query = db.select().from(content).where(
-      and(
-        eq(content.type, type),
-        eq(content.isActive, true)
-      )
+    const baseCondition = and(
+      eq(content.type, type),
+      eq(content.isActive, true)
     );
 
-    // Apply filters
+    // Build conditions array
+    const conditions = [baseCondition];
+    
     if (filters) {
       if (filters.year) {
-        query = query.where(eq(content.year, parseInt(filters.year)));
+        conditions.push(eq(content.year, parseInt(filters.year)));
       }
       if (filters.language) {
-        query = query.where(eq(content.language, filters.language));
+        conditions.push(eq(content.language, filters.language));
       }
       if (filters.quality) {
-        query = query.where(eq(content.quality, filters.quality));
+        conditions.push(eq(content.quality, filters.quality));
       }
       if (filters.resolution) {
-        query = query.where(eq(content.resolution, filters.resolution));
+        conditions.push(eq(content.resolution, filters.resolution));
       }
       if (filters.rating) {
-        query = query.where(sql`${content.rating} >= ${filters.rating}`);
+        conditions.push(sql`${content.rating} >= ${filters.rating}`);
       }
     }
 
+    const finalCondition = conditions.length > 1 ? and(...conditions) : conditions[0];
+    
     const offset = (page - 1) * limit;
-    const contentItems = await query
+    const contentItems = await db.select().from(content)
+      .where(finalCondition)
       .orderBy(desc(content.createdAt))
       .limit(limit)
       .offset(offset);
 
-    const [{ count }] = await db.select({ count: sql<number>`count(*)` }).from(content).where(
-      and(
-        eq(content.type, type),
-        eq(content.isActive, true)
-      )
-    );
+    const [{ count }] = await db.select({ count: sql<number>`count(*)` }).from(content)
+      .where(finalCondition);
 
     return {
       content: contentItems,
@@ -104,38 +103,41 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createContent(insertContent: InsertContent): Promise<Content> {
-    const [content] = await db.insert(content).values(insertContent).returning();
-    return content;
+    const [newContent] = await db.insert(content).values(insertContent).returning();
+    return newContent;
   }
 
   async updateContent(id: number, updateContent: Partial<InsertContent>): Promise<Content> {
-    const [content] = await db.update(content)
+    const [updatedContent] = await db.update(content)
       .set({ ...updateContent, updatedAt: new Date() })
       .where(eq(content.id, id))
       .returning();
-    return content;
+    return updatedContent;
   }
 
   async deleteContent(id: number): Promise<boolean> {
     const result = await db.update(content)
       .set({ isActive: false })
       .where(eq(content.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   async searchContent(query: string, type?: string): Promise<Content[]> {
-    let searchQuery = db.select().from(content).where(
-      and(
-        eq(content.isActive, true),
-        sql`(${content.title} ILIKE ${`%${query}%`} OR ${content.titleArabic} ILIKE ${`%${query}%`})`
-      )
-    );
+    const conditions = [
+      eq(content.isActive, true),
+      sql`(${content.title} ILIKE ${`%${query}%`} OR ${content.titleArabic} ILIKE ${`%${query}%`})`
+    ];
 
     if (type) {
-      searchQuery = searchQuery.where(eq(content.type, type));
+      conditions.push(eq(content.type, type));
     }
 
-    return await searchQuery.orderBy(desc(content.createdAt)).limit(50);
+    const searchResults = await db.select().from(content)
+      .where(and(...conditions))
+      .orderBy(desc(content.createdAt))
+      .limit(50);
+
+    return searchResults;
   }
 
   async getAllGenres(): Promise<Genre[]> {
