@@ -9,6 +9,7 @@ import Movies from "@/pages/movies";
 import Series from "@/pages/series";
 import Television from "@/pages/television";
 import Miscellaneous from "@/pages/miscellaneous";
+import ContentDetail from "@/pages/content-detail";
 import Admin from "@/pages/admin";
 
 function Router() {
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/series" component={Series} />
       <Route path="/television" component={Television} />
       <Route path="/miscellaneous" component={Miscellaneous} />
+      <Route path="/content/:id" component={ContentDetail} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>

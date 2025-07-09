@@ -2,6 +2,7 @@ import { Star, Download, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Content } from "@shared/schema";
 import { QUALITY_OPTIONS } from "@/lib/constants";
+import { useLocation } from "wouter";
 
 interface ContentCardProps {
   content: Content;
@@ -9,13 +10,18 @@ interface ContentCardProps {
 }
 
 export default function ContentCard({ content, onClick }: ContentCardProps) {
+  const [, setLocation] = useLocation();
   const qualityOption = QUALITY_OPTIONS.find(q => q.value === content.quality);
   const qualityColor = qualityOption?.color || 'bg-gray-500';
 
+  const handleClick = () => {
+    setLocation(`/content/${content.id}`);
+  };
+
   return (
     <div 
-      className="content-card group"
-      onClick={() => onClick?.(content)}
+      className="content-card group cursor-pointer"
+      onClick={handleClick}
     >
       <div className="relative">
         <img 
